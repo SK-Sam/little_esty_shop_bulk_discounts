@@ -12,11 +12,7 @@
 /tmp/*
 !/log/.keep
 !/tmp/.keep
-coverage/
-coverage/.resultset.json
-coverage/index.html
-coverage/.last_run.json
-coverage/.
+/coverage/
 
 .DS_Store
 # Ignore uploaded files in development
