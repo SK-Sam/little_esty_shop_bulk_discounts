@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_12_025630) do
+ActiveRecord::Schema.define(version: 2021_01_16_063712) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,24 @@ ActiveRecord::Schema.define(version: 2021_01_12_025630) do
     t.string "city"
     t.string "state"
     t.bigint "zip"
+  end
+
+  create_table "discount_items", force: :cascade do |t|
+    t.bigint "discount_id"
+    t.bigint "item_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discount_id"], name: "index_discount_items_on_discount_id"
+    t.index ["item_id"], name: "index_discount_items_on_item_id"
+  end
+
+  create_table "discounts", force: :cascade do |t|
+    t.float "percent"
+    t.integer "threshold"
+    t.bigint "merchant_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["merchant_id"], name: "index_discounts_on_merchant_id"
   end
 
   create_table "invoice_items", force: :cascade do |t|
@@ -76,6 +94,9 @@ ActiveRecord::Schema.define(version: 2021_01_12_025630) do
     t.index ["invoice_id"], name: "index_transactions_on_invoice_id"
   end
 
+  add_foreign_key "discount_items", "discounts"
+  add_foreign_key "discount_items", "items"
+  add_foreign_key "discounts", "merchants"
   add_foreign_key "invoice_items", "invoices"
   add_foreign_key "invoice_items", "items"
   add_foreign_key "invoices", "customers"
