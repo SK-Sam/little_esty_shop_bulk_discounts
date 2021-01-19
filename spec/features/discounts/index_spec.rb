@@ -15,5 +15,12 @@ RSpec.describe 'Merchant Discount Index Page' do
         expect(page).to have_content(@discount1.threshold)
       end
     end
+    it 'can have a button that links to new discount page' do
+      expect(page).to have_button "Create New Discount"
+      
+      click_button "Create New Discount"
+
+      expect(current_path).to eq(new_merchant_discount(@merchant1))
+    end
   end
 end
