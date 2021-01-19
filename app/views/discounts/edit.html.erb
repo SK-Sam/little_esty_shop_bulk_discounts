@@ -1,0 +1,5 @@
+<%= render partial: 'merchant_links', locals: { merchant: @merchant } %>
+
+<%= render partial: 'form', locals: {
+  discount: @discount, path: merchant_discount_path(@merchant, @discount), method: :patch, button_text: "Update Discount"
+} %>
