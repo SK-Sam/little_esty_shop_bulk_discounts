@@ -1,0 +1,15 @@
+<%= render partial: 'merchant_links', locals: {merchant: @merchant} %>
+
+<div class="row">
+  <p class='col-12'>Create Discount</p>
+</div>
+
+<%= form_with model: @discount, url: merchant_discounts_path(@merchant), method: :post do |f| %>
+  <%= f.label :quantity_threshold %>
+  <%= f.number_field :threshold %>
+  
+  <%= f.label :percent_off %>
+  <%= f.number_field :percent%>
+
+  <%= f.submit "Create New Discount" %>
+<% end %>
