@@ -8,7 +8,8 @@
   <ul class='mr-auto col-sm-4'>
     <% @merchant.discounts.each do |discount| %>
       <section id="discount-<%= discount.id %>">
-        <li><%= link_to "#{discount.percent}% off @ #{discount.threshold} items" %></li>
+        <li><%= link_to "#{discount.percent}% off @ #{discount.threshold} items" %> <%= button_to "Delete Discount",
+         merchant_discount_path(@merchant, id: discount.id), method: :delete %></li>
       </section>
     <% end %>
   </ul>

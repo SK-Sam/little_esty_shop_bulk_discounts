@@ -16,8 +16,13 @@ class DiscountsController < ApplicationController
       redirect_to merchant_discounts_path(params[:merchant_id])
     else
       flash[:error] = @discount.errors.full_messages
-      redirect_to new_merchant_discount_path(params[:merchant_id])
+      redirect_to new_merchant_discount_path(@merchant)
     end
+  end
+
+  def destroy
+    Discount.destroy(params[:id])
+    redirect_to merchant_discounts_path(@merchant)
   end
 
   private
