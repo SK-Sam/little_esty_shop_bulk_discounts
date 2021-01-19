@@ -1,2 +1,15 @@
 <%= render partial: 'merchant_links', locals: {merchant: @merchant} %>
 
+<div class="row">
+  <p class='col-12'>My Discounts</p>
+</div>
+
+<section class='discounts'>
+  <ul class='mr-auto col-sm-4'>
+    <% @merchant.discounts.each do |discount| %>
+      <section id="discount-<%= discount.id %>">
+        <li><%= link_to "#{discount.percent}% off @ #{discount.threshold} items" %></li>
+      </section>
+    <% end %>
+  </ul>
+</section>
