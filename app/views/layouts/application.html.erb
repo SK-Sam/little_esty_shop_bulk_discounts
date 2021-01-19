@@ -71,15 +71,7 @@
   <body>
     <div class="top-container">
       <h1 style="text-align:center; background-color:#EBEFF3;">Little Esty Shop</h1>
-      <% flash.each do |type, msgs| %>
-        <% if msgs.respond_to? :each %>
-          <% msgs.each do |msg| %>
-            <h3><b><%= msg %></b></h3>
-          <% end %>
-        <% else %>
-          <h3><b><%= msgs %></b></h3>
-        <% end %>
-      <% end %>
+      <%= render partial: 'errors_flash' %>
       <%= yield %>
 
     </div>

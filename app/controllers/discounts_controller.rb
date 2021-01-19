@@ -10,14 +10,13 @@ class DiscountsController < ApplicationController
 
   def create
     @discount = @merchant.discounts.new(discount_params)
-    require 'pry'; binding.pry
     if @discount.valid?
       @discount.save
       flash.notice = "Discount was created successfully!"
       redirect_to merchant_discounts_path(params[:merchant_id])
     else
       flash[:error] = @discount.errors.full_messages
-      render :new
+      redirect_to new_merchant_discount_path(params[:merchant_id])
     end
   end
 

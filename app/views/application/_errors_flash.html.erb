@@ -1,0 +1,9 @@
+<% flash.each do |type, msgs| %>
+  <% if msgs.respond_to? :each %>
+    <% msgs.each do |msg| %>
+      <h3><b><%= msg %></b></h3>
+    <% end %>
+  <% else %>
+    <h3><b><%= msgs %></b></h3>
+  <% end %>
+<% end %>
