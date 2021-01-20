@@ -72,17 +72,26 @@ describe Merchant do
     it "top_5_items" do
       expect(@merchant1.top_5_items).to eq([@item_1, @item_2, @item_3, @item_8, @item_4])
     end
+  end
+  describe 'instance revenue methods' do
+    before :each do
+      @merchant = Merchant.create!(name: "Three Merchants")
+      @discount = @merchant.discounts.create!(threshold: 10, percent: 10)
+      @item = @merchant.items.create!(name: "Discounted At $45 On Threshold", description: "10 * 5 * 0.1", unit_price: 5, merchant_id: @merchant.id)
+      @discount_item = DiscountItem.create!(discount: @discount, item: @item)
+      @customer = Customer.create!(first_name: "test1", last_name: "test2")
+      @invoice = Invoice.create!(customer: @customer, merchant: @merchant, status: 1)
+      @invoice_item = InvoiceItem.create!(status: 1, invoice: @invoice, item: @item, quantity: 10, unit_price: 5)
+    end
+    it '#discounted_items_revenue' do
+      expected = (@invoice_item.quantity * @invoice_item.unit_price) * ((100 - @discount.percent) / 100)
+      expect(@merchant.discounted_items_revenue).to eq(expected)
+    end
+    it '#non_discounted_items_revenue' do
+      expect(@merchant.non_discounted_items_revenue).to eq(0)
+    end
     it "#total_revenue" do
-      merchant = Merchant.create!(name: "Three Merchants")
-      discount = merchant.discounts.create!(threshold: 10, percent: 10)
-      item = merchant.items.create!(name: "Discounted At $45 On Threshold", description: "10 * 5 * 0.1", unit_price: 5, merchant_id: merchant.id)
-      discount_item = DiscountItem.create!(discount: discount, item: item)
-      customer = Customer.create!(first_name: "test1", last_name: "test2")
-      invoice = Invoice.create!(customer: customer, merchant: merchant, status: 1)
-      invoice_item = InvoiceItem.create!(status: 1, invoice: invoice, item: item, quantity: 10, unit_price: 5)
-      
-      expected = (invoice_item.quantity * invoice_item.unit_price) * ((100 - discount.percent) / 100)
-      expect(merchant.total_revenue).to eq(expected)
+      expect(@merchant.total_revenue).to eq(45.0)
     end
   end
 end
