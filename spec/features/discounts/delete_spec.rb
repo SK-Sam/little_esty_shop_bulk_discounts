@@ -15,8 +15,10 @@ RSpec.describe 'Delete Functionality' do
 
       expect(current_path).to eq(merchant_discounts_path(merchant1))
 
-      expect(page).not_to have_content(discount1.threshold)
-      expect(page).not_to have_content(discount1.percent)
+      within('section.discounts') do
+        expect(page).not_to have_content(discount1.threshold)
+        expect(page).not_to have_content(discount1.percent)
+      end
     end
   end
 end
