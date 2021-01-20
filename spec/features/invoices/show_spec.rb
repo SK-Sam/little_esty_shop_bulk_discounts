@@ -113,9 +113,9 @@ RSpec.describe 'invoices show' do
     discount1 = @merchant1.discounts.create!(threshold: 9 , percent: 50)
     visit merchant_invoice_path(@merchant1, @invoice_1)
 
-    expect(page).to have_link("Discount Page")
+    expect(page.all('.discount-link').count).to eq(2)
 
-    click_on "Discount Page"
+    first('.discount-link').click
 
     expect(current_path).to eq(merchant_discount_path(@merchant1, discount1))
   end
