@@ -83,14 +83,14 @@ describe Merchant do
       @invoice = Invoice.create!(customer: @customer, merchant: @merchant, status: 1)
       @invoice_item = InvoiceItem.create!(status: 1, invoice: @invoice, item: @item, quantity: 10, unit_price: 5)
     end
-    xit '#discounted_items_revenue' do
+    it '#discounted_items_revenue' do
       expected = (@invoice_item.quantity * @invoice_item.unit_price) * ((100 - @discount.percent) / 100)
       expect(@merchant.discounted_items_revenue).to eq(expected)
     end
-    xit '#non_discounted_items_revenue' do
+    it '#non_discounted_items_revenue' do
       expect(@merchant.non_discounted_items_revenue).to eq(0)
     end
-    xit "#total_revenue" do
+    it "#total_revenue" do
       expect(@merchant.total_revenue).to eq(45.0)
     end
     it '#discount_amount' do
@@ -102,9 +102,25 @@ describe Merchant do
     it '#total_revenue_discounted with numerous discounts' do
       previous_discount = @merchant.total_revenue_discounted(@invoice)
       discount_item_2 = @merchant.discounts.create!(threshold: 5, percent: 50)
-      
+
       expect(@merchant.total_revenue_discounted(@invoice)).not_to eq(previous_discount)
       expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice.total_revenue - @merchant.discount_amount)
+    end
+    it '#discountable_items' do
+      expect(@merchant.discountable_items(@invoice_item).size).not_to eq(0)
+
+      invoice_item2 = InvoiceItem.create!(status: 1, invoice: @invoice, item: @item, quantity: 1, unit_price: 1)
+
+      expect(@merchant.discountable_items(invoice_item2).size).to eq(0)
+    end
+    it '#discounted_by_highest_percent' do
+      discount_item_2 = @merchant.discounts.create!(threshold: 1, percent: 1)
+      expected = @merchant.discounts.max_by do |discount|
+        discount.percent
+      end.percent
+
+      expect(@merchant.discount_by_highest_percent(@invoice_item).percent).to eq(expected)
+      expect(@merchant.discount_by_highest_percent(@invoice_item)).not_to eq(discount_item_2)
     end
   end
 end
