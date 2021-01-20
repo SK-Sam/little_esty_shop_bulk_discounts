@@ -58,7 +58,6 @@ describe Merchant do
       @transaction5 = Transaction.create!(credit_card_number: 102938, result: 1, invoice_id: @invoice_5.id)
       @transaction6 = Transaction.create!(credit_card_number: 879799, result: 0, invoice_id: @invoice_6.id)
       @transaction7 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_7.id)
-
     end
     it "can list items ready to ship" do
       expect(@merchant1.ordered_items_to_ship).to eq([@item_1, @item_1, @item_3, @item_4, @item_7, @item_8, @item_4])
@@ -72,6 +71,18 @@ describe Merchant do
 
     it "top_5_items" do
       expect(@merchant1.top_5_items).to eq([@item_1, @item_2, @item_3, @item_8, @item_4])
+    end
+    it "#total_revenue" do
+      merchant = Merchant.create!(name: "Three Merchants")
+      discount = merchant.discounts.create!(threshold: 10, percent: 10)
+      item = merchant.items.create!(name: "Discounted At $45 On Threshold", description: "10 * 5 * 0.1", unit_price: 5, merchant_id: merchant.id)
+      discount_item = DiscountItem.create!(discount: discount, item: item)
+      customer = Customer.create!(first_name: "test1", last_name: "test2")
+      invoice = Invoice.create!(customer: customer, merchant: merchant, status: 1)
+      invoice_item = InvoiceItem.create!(status: 1, invoice: invoice, item: item, quantity: 10, unit_price: 5)
+      
+      expected = (invoice_item.quantity * invoice_item.unit_price) * ((100 - discount.percent) / 100)
+      expect(merchant.total_revenue).to eq(expected)
     end
   end
 end
