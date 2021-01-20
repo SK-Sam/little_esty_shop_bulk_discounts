@@ -1,0 +1,9 @@
+<%= form_with model: discount, url: path, method: method do |f| %>
+  <%= f.label :quantity_threshold %>
+  <%= f.number_field :threshold, value: discount.threshold || "" %>
+  
+  <%= f.label :percent_off %>
+  <%= f.number_field :percent, value: discount.percent || "" %>
+
+  <%= f.submit button_text %>
+<% end %>

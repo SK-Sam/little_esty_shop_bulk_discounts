@@ -16,7 +16,7 @@ class Item < ApplicationRecord
     invoices
     .joins(:invoice_items)
     .where('invoices.status = 2')
-    .select('invoices.*, sum(invoice_items.unit_price * invoice_items.quantity) as money')
+    .select('invoices.created_at AS created_at, sum(invoice_items.unit_price * invoice_items.quantity) as money')
     .group(:id)
     .order("money desc", "created_at desc")
     .first

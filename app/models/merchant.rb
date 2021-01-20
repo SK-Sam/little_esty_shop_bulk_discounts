@@ -5,6 +5,7 @@ class Merchant < ApplicationRecord
   has_many :customers, through: :invoices
   has_many :transactions, through: :invoices
   has_many :invoice_items, through: :items
+  has_many :discounts
 
   enum status: [:enabled, :disabled]
 
@@ -19,7 +20,7 @@ class Merchant < ApplicationRecord
   end
 
   def ordered_items_to_ship
-    item_ids = InvoiceItem.where("status = 0 OR status = 1").order(:created_at).pluck(:item_id)
+    item_ids = InvoiceItem.where("status = 0 OR status = 1").order(:created_at).limit(100).pluck(:item_id)
     item_ids.map do |id|
       Item.find(id)
     end
