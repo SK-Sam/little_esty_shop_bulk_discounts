@@ -36,14 +36,5 @@ RSpec.describe Invoice, type: :model do
       @ii_11 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_8.id, quantity: 1, unit_price: 10, status: 1)
       @discount = @merchant1.discounts.create!(threshold: 5, percent: 10)
     end
-    it "#revenue_discounted" do
-      expect(@invoice_1.revenue_discounted).to eq(81.0)
-    end
-    it "#revenue_non_discounted" do
-      expect(@invoice_1.revenue_non_discounted).to eq(10.0)
-    end
-    it "#total_revenue_discounted" do
-      expect(@invoice_1.total_revenue_discounted).to eq(91.0)
-    end
   end
 end

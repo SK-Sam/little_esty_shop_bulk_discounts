@@ -75,8 +75,8 @@ class Merchant < ApplicationRecord
     discounted_items_revenue + non_discounted_items_revenue
   end
 
-  def discount_amount
-    invoice_items.sum do |invoice_item|
+  def discount_amount(invoice)
+    invoice.invoice_items.sum do |invoice_item|
       discount_list = discounts.where("threshold <=  #{invoice_item.quantity}")
       if discount_list.empty?
         0
@@ -87,7 +87,7 @@ class Merchant < ApplicationRecord
   end
 
   def total_revenue_discounted(invoice)
-    invoice.total_revenue - discount_amount
+    invoice.total_revenue - discount_amount(invoice)
   end
 
   def discount_by_highest_percent(invoice_item)
