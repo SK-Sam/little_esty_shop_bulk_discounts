@@ -99,5 +99,12 @@ describe Merchant do
     it '#total_revenue_discounted' do
       expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice.total_revenue - @merchant.discount_amount)
     end
+    it '#total_revenue_discounted with numerous discounts' do
+      previous_discount = @merchant.total_revenue_discounted(@invoice)
+      discount_item_2 = @merchant.discounts.create!(threshold: 5, percent: 50)
+      
+      expect(@merchant.total_revenue_discounted(@invoice)).not_to eq(previous_discount)
+      expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice.total_revenue - @merchant.discount_amount)
+    end
   end
 end
