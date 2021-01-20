@@ -91,6 +91,7 @@ RSpec.describe 'invoices show' do
     within("#the-status-#{@ii_1.id}") do
       page.select("cancelled")
       click_button "Update Invoice"
+
       expect(page).to have_content("cancelled")
       expect(page).to_not have_content("in progress")
      end
@@ -99,8 +100,9 @@ RSpec.describe 'invoices show' do
   it 'can see total revenue discounted for each invoice page' do
     discount1 = @merchant1.discounts.create!(threshold: 9 , percent: 50)
     visit merchant_invoice_path(@merchant1, @invoice_1)
-
-    expect(page).to have_content("Total Revenue with discounts applied: #{@merchant1.total_revenue_discounted(@invoice_1)}")
+    within('section.revenue-stats') do
+      expect(page).to have_content("Total Revenue with discounts applied: #{@merchant1.total_revenue_discounted(@invoice_1)}")
+    end
   end
 
   it 'can link to bulk discount show page for each applicable discount' do

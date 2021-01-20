@@ -1,7 +1,8 @@
 <%= render partial: 'merchant_links', locals: { merchant: @merchant } %>
 <h1>Discount Specifics</h1>
-
-<p>Items must reach <%= @discount.threshold %> threshold to receive discount </p>
-<p>Items will receive <%= @discount.percent %>% off if threshold is reached</p>
+<section class="discount-stats">
+  <p>Items must reach <%= @discount.threshold %> threshold to receive discount </p>
+  <p>Items will receive <%= @discount.percent %>% off if threshold is reached</p>
+</section>
 
 <%= link_to "Edit Discount", edit_merchant_discount_path(@merchant, @discount)%>
