@@ -58,7 +58,32 @@ describe Merchant do
       @transaction5 = Transaction.create!(credit_card_number: 102938, result: 1, invoice_id: @invoice_5.id)
       @transaction6 = Transaction.create!(credit_card_number: 879799, result: 0, invoice_id: @invoice_6.id)
       @transaction7 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_7.id)
+    end
+    it 'can test for top 5 merchants' do
+      merchant3 = Merchant.create!(name: "Merch 3")
+      merchant4 = Merchant.create!(name: "Merch 4")
+      merchant5 = Merchant.create!(name: "Merch 5")
+      merchant1 = Merchant.create!(name: "Merch 1")
+      customer_5 = Customer.create!(first_name: 'Sylvester', last_name: 'Nader')
+      customer_6 = Customer.create!(first_name: 'Herber', last_name: 'Coon')
+      item_5 = Item.create!(name: "Bracelet", description: "Wrist bling", unit_price: 200, merchant_id: merchant3.id)
+      item_6 = Item.create!(name: "Necklace", description: "Neck bling", unit_price: 300, merchant_id: merchant4.id)
+      invoice_4 = Invoice.create!(merchant_id: merchant1.id, customer_id: customer_5.id, status: 2)
+      invoice_5 = Invoice.create!(merchant_id: merchant5.id, customer_id: customer_6.id, status: 2)
+      invoice_6 = Invoice.create!(merchant_id: merchant4.id, customer_id: customer_6.id, status: 2)
+      ii_8 = InvoiceItem.create!(invoice_id: invoice_4.id, item_id: item_6.id, quantity: 1, unit_price: 5, status: 1, created_at: "2012-04-03 14:54:09")
+      ii_9 = InvoiceItem.create!(invoice_id: invoice_5.id, item_id: item_5.id, quantity: 1, unit_price: 1, status: 1, created_at: "2012-04-04 14:54:09")
+      transaction6 = Transaction.create!(credit_card_number: 879799, result: 1, invoice_id: invoice_4.id)
+      transaction7 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice_5.id)
+      transaction8 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice_6.id)
+      transaction9 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice_5.id)
+      transaction10 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: invoice_5.id)
 
+      expected = [@merchant1, merchant1, merchant5]
+      expect(Merchant.top_merchants).to eq(expected)
+    end
+    it 'can check for best day' do
+      expect(@merchant1.best_day).to eq(@invoice_1.created_at.to_date)
     end
     it "can list items ready to ship" do
       expect(@merchant1.ordered_items_to_ship).to eq([@item_1, @item_1, @item_3, @item_4, @item_7, @item_8, @item_4])
@@ -72,6 +97,65 @@ describe Merchant do
 
     it "top_5_items" do
       expect(@merchant1.top_5_items).to eq([@item_1, @item_2, @item_3, @item_8, @item_4])
+    end
+  end
+  describe 'instance revenue methods' do
+    before :each do
+      @merchant = Merchant.create!(name: "Three Merchants")
+      @discount = @merchant.discounts.create!(threshold: 10, percent: 10)
+      @item = @merchant.items.create!(name: "Discounted At $45 On Threshold", description: "10 * 5 * 0.1", unit_price: 5, merchant_id: @merchant.id)
+      @discount_item = DiscountItem.create!(discount: @discount, item: @item)
+      @customer = Customer.create!(first_name: "test1", last_name: "test2")
+      @invoice = Invoice.create!(customer: @customer, merchant: @merchant, status: 1)
+      @invoice_item = InvoiceItem.create!(status: 1, invoice: @invoice, item: @item, quantity: 10, unit_price: 5)
+    end
+    it '#discounted_items_revenue' do
+      expected = (@invoice_item.quantity * @invoice_item.unit_price) * ((100 - @discount.percent) / 100)
+      expect(@merchant.discounted_items_revenue).to eq(expected)
+
+      Merchant.destroy_all
+      merchant = Merchant.new(name: "test")
+      expect(merchant.discounted_items_revenue).to eq(0)
+    end
+    it '#non_discounted_items_revenue' do
+      expect(@merchant.non_discounted_items_revenue).to eq(0)
+    end
+    it "#total_revenue" do
+      expect(@merchant.total_revenue).to eq(45.0)
+    end
+    it '#discount_amount' do
+      expect(@merchant.discount_amount(@invoice)).to eq(@invoice_item.quantity * @invoice_item.unit_price / 10)
+    end
+    it '#discount_amount with empty discount_list' do
+      @discount.update(threshold: 100)
+          
+      expect(@merchant.discount_amount(@invoice)).to eq(0)
+    end
+    it '#total_revenue_discounted' do
+      expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice.total_revenue - @merchant.discount_amount(@invoice))
+    end
+    it '#total_revenue_discounted with numerous discounts' do
+      previous_discount = @merchant.total_revenue_discounted(@invoice)
+      discount_item_2 = @merchant.discounts.create!(threshold: 5, percent: 50)
+
+      expect(@merchant.total_revenue_discounted(@invoice)).not_to eq(previous_discount)
+      expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice_item.quantity * @invoice_item.unit_price * discount_item_2.percent / 100)
+    end
+    it '#discountable_items' do
+      expect(@merchant.discountable_items(@invoice_item).size).not_to eq(0)
+
+      invoice_item2 = InvoiceItem.create!(status: 1, invoice: @invoice, item: @item, quantity: 1, unit_price: 1)
+
+      expect(@merchant.discountable_items(invoice_item2).size).to eq(0)
+    end
+    it '#discounted_by_highest_percent' do
+      discount_item_2 = @merchant.discounts.create!(threshold: 1, percent: 1)
+      expected = @merchant.discounts.max_by do |discount|
+        discount.percent
+      end.percent
+
+      expect(@merchant.discount_by_highest_percent(@invoice_item).percent).to eq(expected)
+      expect(@merchant.discount_by_highest_percent(@invoice_item)).not_to eq(discount_item_2)
     end
   end
 end

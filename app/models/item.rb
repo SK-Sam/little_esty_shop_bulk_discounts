@@ -4,9 +4,9 @@ class Item < ApplicationRecord
                         :unit_price,
                         :merchant_id
 
-  has_many :invoice_items
+  has_many :invoice_items, dependent: :destroy
   has_many :invoices, through: :invoice_items
-  has_many :discount_items
+  has_many :discount_items, dependent: :destroy
   has_many :discounts, through: :discount_items
   belongs_to :merchant
 

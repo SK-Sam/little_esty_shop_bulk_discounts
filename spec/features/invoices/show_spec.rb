@@ -96,4 +96,22 @@ RSpec.describe 'invoices show' do
      end
   end
 
+  it 'can see total revenue discounted for each invoice page' do
+    discount1 = @merchant1.discounts.create!(threshold: 9 , percent: 50)
+    visit merchant_invoice_path(@merchant1, @invoice_1)
+
+    expect(page).to have_content("Total Revenue with discounts applied: #{@merchant1.total_revenue_discounted(@invoice_1)}")
+  end
+
+  it 'can link to bulk discount show page for each applicable discount' do
+    discount1 = @merchant1.discounts.create!(threshold: 9 , percent: 50)
+    visit merchant_invoice_path(@merchant1, @invoice_1)
+
+    expect(page.all('.discount-link').count).to eq(2)
+
+    first('.discount-link').click
+
+    expect(current_path).to eq(merchant_discount_path(@merchant1, discount1))
+  end
+
 end

@@ -69,5 +69,12 @@ describe 'Admin Invoices Index Page' do
       expect(@i1.status).to eq('complete')
     end
   end
+
+  it 'should show total revenue per show page including discounts calculated' do
+      discount_1 = @m1.discounts.create!(threshold: 10, percent: 50)
+      visit admin_invoice_path(@i1)
+
+      expect(page).to have_content("Total Revenue with discounts applied: $#{@m1.total_revenue_discounted(@i1)}")
+  end
 end
 
