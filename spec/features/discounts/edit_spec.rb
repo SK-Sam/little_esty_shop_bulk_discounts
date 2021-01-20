@@ -27,5 +27,17 @@ RSpec.describe 'Edit Discount Page' do
       expect(page).to have_content("Items must reach #{threshold} threshold to receive discount")
       expect(page).to have_content("Items will receive #{percent}% off if threshold is reached")
     end
+    it 'can show sad paths when invalid information' do
+      visit merchant_discount_path(@merchant, @discount)
+      click_on "Edit Discount"
+      fill_in 'discount_threshold', with: ""
+      fill_in 'discount[percent]', with: ""
+      click_on "Update Discount"
+      
+      within('section.errors') do
+        expect(page).to have_content("Threshold can't be blank")
+        expect(page).to have_content("Percent can't be blank")
+      end
+    end
   end
 end

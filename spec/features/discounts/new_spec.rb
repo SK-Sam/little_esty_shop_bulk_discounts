@@ -23,5 +23,15 @@ RSpec.describe 'Merchant Discount New Page' do
       expect(page).to have_content(percent)
       expect(page).to have_content(threshold)
     end
+    it 'can show sad paths when invalid information' do
+      visit merchant_discounts_path(@merchant1)
+      click_on "Create New Discount"
+      click_on "Create New Discount"
+      
+      within('section.errors') do
+        expect(page).to have_content("Threshold can't be blank")
+        expect(page).to have_content("Percent can't be blank")
+      end
+    end
   end
 end
