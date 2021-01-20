@@ -57,21 +57,36 @@ class Merchant < ApplicationRecord
     .to_date
   end
 
-  def discounted_items_revenue
-    sql = "SELECT SUM(invoice_items.quantity * invoice_items.unit_price * ((100 - discounts.percent) / 100)) AS discounted_price FROM merchants INNER JOIN discounts ON merchants.id = discounts.merchant_id INNER JOIN items ON merchants.id = items.merchant_id INNER JOIN invoice_items ON items.id = invoice_items.item_id WHERE invoice_items.quantity >= discounts.threshold;"
-    value = ActiveRecord::Base.connection.execute(sql).first['discounted_price']
-    return value unless value == nil
-    return 0
+  # def discounted_items_revenue
+  #   sql = "SELECT SUM(invoice_items.quantity * invoice_items.unit_price * ((100 - discounts.percent) / 100)) AS discounted_price FROM merchants INNER JOIN discounts ON merchants.id = discounts.merchant_id INNER JOIN items ON merchants.id = items.merchant_id INNER JOIN invoice_items ON items.id = invoice_items.item_id WHERE invoice_items.quantity >= discounts.threshold;"
+  #   value = ActiveRecord::Base.connection.execute(sql).first['discounted_price']
+  #   return value unless value == nil
+  #   return 0
+  # end
+
+  # def non_discounted_items_revenue
+  #   sql = "SELECT SUM(invoice_items.quantity * invoice_items.unit_price) AS non_discounted_price FROM merchants INNER JOIN discounts ON merchants.id = discounts.merchant_id INNER JOIN items ON merchants.id = items.merchant_id INNER JOIN invoice_items ON items.id = invoice_items.item_id WHERE invoice_items.quantity < discounts.threshold;"
+  #   value = ActiveRecord::Base.connection.execute(sql).first['non_discounted_price']
+  #   return value unless value == nil
+  #   return 0
+  # end
+
+  # def total_revenue
+  #   discounted_items_revenue + non_discounted_items_revenue
+  # end
+
+  def discount_amount
+    invoice_items.sum do |invoice_item|
+      discount_list = discounts.where("threshold <=  #{invoice_item.quantity}")
+      if discount_list.empty?
+        0
+      else
+        (invoice_item.quantity * invoice_item.unit_price) * (discount_list.maximum(:percent)/100)
+      end
+    end
   end
 
-  def non_discounted_items_revenue
-    sql = "SELECT SUM(invoice_items.quantity * invoice_items.unit_price) AS non_discounted_price FROM merchants INNER JOIN discounts ON merchants.id = discounts.merchant_id INNER JOIN items ON merchants.id = items.merchant_id INNER JOIN invoice_items ON items.id = invoice_items.item_id WHERE invoice_items.quantity < discounts.threshold;"
-    value = ActiveRecord::Base.connection.execute(sql).first['non_discounted_price']
-    return value unless value == nil
-    return 0
-  end
-
-  def total_revenue
-    discounted_items_revenue + non_discounted_items_revenue
+  def total_revenue_discounted(invoice)
+    invoice.total_revenue - discount_amount
   end
 end
