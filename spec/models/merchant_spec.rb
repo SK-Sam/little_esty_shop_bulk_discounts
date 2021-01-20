@@ -94,17 +94,17 @@ describe Merchant do
       expect(@merchant.total_revenue).to eq(45.0)
     end
     it '#discount_amount' do
-      expect(@merchant.discount_amount).to eq(@invoice_item.quantity * @invoice_item.unit_price / 10)
+      expect(@merchant.discount_amount(@invoice)).to eq(@invoice_item.quantity * @invoice_item.unit_price / 10)
     end
     it '#total_revenue_discounted' do
-      expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice.total_revenue - @merchant.discount_amount)
+      expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice.total_revenue - @merchant.discount_amount(@invoice))
     end
     it '#total_revenue_discounted with numerous discounts' do
       previous_discount = @merchant.total_revenue_discounted(@invoice)
       discount_item_2 = @merchant.discounts.create!(threshold: 5, percent: 50)
 
       expect(@merchant.total_revenue_discounted(@invoice)).not_to eq(previous_discount)
-      expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice.total_revenue - @merchant.discount_amount)
+      expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice_item.quantity * @invoice_item.unit_price * discount_item_2.percent / 100)
     end
     it '#discountable_items' do
       expect(@merchant.discountable_items(@invoice_item).size).not_to eq(0)

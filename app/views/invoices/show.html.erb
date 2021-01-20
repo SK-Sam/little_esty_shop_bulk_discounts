@@ -40,7 +40,7 @@
                                             <%= f.select :status, Invoice.statuses.keys, selected: "#{@invoice.status}" %>
                                             <%= f.submit 'Update Invoice' %>
                                           <% end %></td>
-            <% if merchant.discountable_items(i).size != 0 %>
+            <% if @merchant.discountable_items(i).size != 0 %>
               <td style="text-align:center">
                 <%= link_to "Discount", merchant_discount_path(@merchant, @merchant.discount_by_highest_percent(i)), class: "discount-link" %>
               </td><br/>
