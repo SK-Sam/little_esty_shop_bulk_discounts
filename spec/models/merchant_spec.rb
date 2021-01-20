@@ -83,15 +83,21 @@ describe Merchant do
       @invoice = Invoice.create!(customer: @customer, merchant: @merchant, status: 1)
       @invoice_item = InvoiceItem.create!(status: 1, invoice: @invoice, item: @item, quantity: 10, unit_price: 5)
     end
-    it '#discounted_items_revenue' do
+    xit '#discounted_items_revenue' do
       expected = (@invoice_item.quantity * @invoice_item.unit_price) * ((100 - @discount.percent) / 100)
       expect(@merchant.discounted_items_revenue).to eq(expected)
     end
-    it '#non_discounted_items_revenue' do
+    xit '#non_discounted_items_revenue' do
       expect(@merchant.non_discounted_items_revenue).to eq(0)
     end
-    it "#total_revenue" do
+    xit "#total_revenue" do
       expect(@merchant.total_revenue).to eq(45.0)
+    end
+    it '#discount_amount' do
+      expect(@merchant.discount_amount).to eq(@invoice_item.quantity * @invoice_item.unit_price / 10)
+    end
+    it '#total_revenue_discounted' do
+      expect(@merchant.total_revenue_discounted(@invoice)).to eq(@invoice.total_revenue - @merchant.discount_amount)
     end
   end
 end
