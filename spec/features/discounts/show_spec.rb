@@ -8,8 +8,10 @@ RSpec.describe 'Show Page for Merchant Discounts' do
       visit merchant_discount_path(@merchant1, @discount1)
     end
     it 'can display a specific discount quantity threshold and percentage discount' do
-      expect(page).to have_content("Items must reach #{@discount1.threshold} threshold to receive discount")
-      expect(page).to have_content("Items will receive #{@discount1.percent}% off if threshold is reached")
+      within('section.discount-stats') do
+        expect(page).to have_content("Items must reach #{@discount1.threshold} threshold to receive discount")
+        expect(page).to have_content("Items will receive #{@discount1.percent}% off if threshold is reached")
+      end
     end
     it 'has a link that leads to an edit page' do
       expect(page).to have_link "Edit Discount"
